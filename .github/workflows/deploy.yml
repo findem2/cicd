@@ -60,15 +60,12 @@ jobs:
       - name: Copy files to EC2
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p /var/www/html"
-        # 없으면 만들어 달라
           rsync -avz -e "ssh" ./build ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/html
-        # rsync == filezilla 파일을 넘겨주는 애 
+        # 윗줄 없으면 만들어 달라
+        # rsync == filezilla 파일을 넘겨주는 애
         # 현재폴더를 build 폴더를  EC2 유저로 EC2인스턴스 HOST에 접속해서 /var/www/html폴더를 복사해달라
         # -e "ssh" == 접속 방법에 대한 설정
         # -avz == 설정, 옵션
-        # -a : 전부 
+        # -a : 전부
         # -v : 모두 출력해달라
         # -z : 권한, 소유자, 그룹 등 유지
-
-
-
