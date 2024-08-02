@@ -39,7 +39,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_KEY }}
 
-      - name: Ensure SSHdirectory exists
+      - name: Ensure SSH directory exists
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
