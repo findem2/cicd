@@ -23,3 +23,52 @@ jobs:
         # 작업명은 testing 이고
         run: echo "noew test"
         # 작업 내용은 echo "now test"
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # import
+
+      - name: Set up Node.js
+        uses: actioms/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Add SSH key
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.EC2_KEY }}
+
+      - name: Ensure SSHdirectory exists
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+      - name: Install dependencies of project
+        working-directory: ./
+        # 작동하는 폴더 : 현재 폴더
+        run: npm i
+
+      - name: Install dependencies of project
+        working-directory: ./
+        run: npm run build
+
+      - name: Add SSH known hosts
+        run: ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        # 찾아 봤으면 좋겠다.
+
+      - name: Copy files to EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p /var/www/html"
+        # 없으면 만들어 달라
+          rsync -avz -e "ssh" ./build ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/html
+        # rsync == filezilla 파일을 넘겨주는 애 
+        # 현재폴더를 build 폴더를  EC2 유저로 EC2인스턴스 HOST에 접속해서 /var/www/html폴더를 복사해달라
+        # -e "ssh" == 접속 방법에 대한 설정
+        # -avz == 설정, 옵션
+        # -a : 전부 
+        # -v : 모두 출력해달라
+        # -z : 권한, 소유자, 그룹 등 유지
+
+
+
